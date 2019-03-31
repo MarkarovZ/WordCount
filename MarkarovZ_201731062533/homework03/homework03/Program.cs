@@ -21,20 +21,40 @@ namespace homework3
     {
         List<string> Lines = new List<string>();//从文档读取到的文本内容
         List<Word> Words = new List<Word>();//检索到的单词
+        List<Word> MutipleWords = new List<Word>();//检索到的词组
+
+        List<string> SaveStrs = new List<string>();
 
         int lines = 0;//有效行数
         int characters = 0;//有效字符数
+
+        public static int number;
+
+        public static int outPutNum;
+
+        public static string path;
+        public static string s_path;
 
         public static Program program = new Program();
 
         static void Main(string[] args)
         {
-            string path = "E:/开发内容/1.txt";
+            program.DataInput();
             program.FileRead(path);
             program.MainCount();
             program.Output();
+            program.FileSave();
         }
 
+        void DataInput()
+        {
+            Console.WriteLine("请依次输入读取文档路径、词组长度、输出单词数量和存储路径：");
+            path = Console.ReadLine();
+            number = int.Parse(Console.ReadLine());
+            outPutNum = int.Parse(Console.ReadLine());
+            //path = "E:/开发内容/1.txt";
+            s_path = Console.ReadLine();
+        }
         /// <summary>
         /// 读取文档
         /// </summary>
@@ -53,7 +73,9 @@ namespace homework3
         /// </summary>
         void MainCount()
         {
-            int wordJudge = 0;
+            int wordJudge = 0;//单词长度标记
+            int MutiWords = 0;//判断目前是否为词组记录状态的标志变量
+            int MutiWordsJudge = 0;//词组长度标记
             bool isWord = true;
             string _word = "";
             foreach (var str in Lines)
@@ -78,6 +100,7 @@ namespace homework3
                             if (wordJudge == 0)
                             {
                                 isWord = false;
+                                MutiWords++;
                             }
                             else
                             {
@@ -101,6 +124,7 @@ namespace homework3
                                         wordJudge = 0;
                                         _word = "";
                                         isWord = true;
+                                        MutiWords = 0;
                                     }
                                 }
                             }
@@ -108,8 +132,10 @@ namespace homework3
                     }
                     else
                     {
+                        MutiWordsJudge++;
                         //检测到空字符时结束当前判断周期，开启新周期
                         isWord = true;
+                        MutiWords = 0;
                         //判断当前检测结果是否构成单词
                         if (wordJudge >= 4)
                         {
@@ -119,8 +145,15 @@ namespace homework3
                         }
                         else
                         {
+                            MutiWords++;
                             wordJudge = 0;
                             _word = "";
+                            MutiWordsJudge = 0;
+                        }
+                        if ((MutiWords == 0) && (MutiWordsJudge == number))
+                        {
+                            MutiWordsAdd();
+                            MutiWordsJudge = 0;
                         }
                     }
                 }
@@ -130,6 +163,11 @@ namespace homework3
                     WordAdd(_word);
                     wordJudge = 0;
                     _word = "";
+                    if ((MutiWords == 0) && (MutiWordsJudge == number - 1))
+                    {
+                        MutiWordsAdd();
+                        MutiWordsJudge = 0;
+                    }
                 }
                 //判断当前行是否为有效行
                 if (lineJudge != 0)
@@ -145,21 +183,47 @@ namespace homework3
         void WordAdd(string _word)
         {
             int flag = 0;
-            int i = 0;
-            foreach (var nword in Words)
+            foreach (var word in Words)
             {
-                if (nword.text == _word)
+                if (word.text == _word)
                 {
-                    nword.num++;
+                    word.num++;
                     flag++;
                     break;
                 }
-                i++;
             }
             if (flag == 0)
             {
                 Word aword = new Word(_word);
                 Words.Add(aword);
+            }
+        }
+        /// <summary>
+        /// 往词组集合添加新词组
+        /// </summary>
+        void MutiWordsAdd()
+        {
+            int flag = 0;
+            int i = 0;
+            int j = Words.Count;
+            string text = "";
+            for (; i < number; i++)
+            {
+                text = text + Words[j - number + i].text + " ";
+            }
+            foreach(var word in MutipleWords)
+            {
+                if (word.text == text)
+                {
+                    word.num++;
+                    flag++;
+                    break;
+                }
+            }
+            if (flag == 0)
+            {
+                Word mutiWord = new Word(text);
+                MutipleWords.Add(mutiWord);
             }
         }
         /// <summary>
@@ -169,10 +233,10 @@ namespace homework3
         {
             List<Word> HIVword = new List<Word>();
             int i = 0;
-            for (; i < Words.Count; i++)
+            for (; i < Words.Count - 1; i++)
             {
                 int j = 0;
-                for (; j < Words.Count; j++)
+                for (; j < Words.Count - 1; j++)
                 {
                     if (Words[i].num > Words[j].num)
                     {
@@ -183,10 +247,21 @@ namespace homework3
                 }
             }
             i = 0;
-            for (; i < 10; i++)
+            if (Words.Count < outPutNum)
             {
-                HIVword.Add(Words[i]);
+                for (; i < Words.Count; i++)
+                {
+                    HIVword.Add(Words[i]);
+                }
             }
+            else
+            {
+                for (; i < outPutNum; i++)
+                {
+                    HIVword.Add(Words[i]);
+                }
+            }
+            
             List<string> words = new List<string>();
             foreach(var word in HIVword)
             {
@@ -202,20 +277,57 @@ namespace homework3
         {
             List<string> words = program.WordSort();
             Console.WriteLine("characters:" + program.characters);
+            SaveStrs.Add("characters:" + program.characters);
             Console.WriteLine("words:" + program.Words.Count);
+            SaveStrs.Add("words: " + program.Words.Count);
             Console.WriteLine("lines:" + program.lines);
+            SaveStrs.Add("lines:" + program.lines);
             int i = 0;
-            for (; i < 10; i++)
+            //输出高频单词
+            if (Words.Count < outPutNum)
             {
-                foreach (var iword in program.Words)
+                for (; i < Words.Count; i++)
                 {
-                    if (words[i] == iword.text)
+                    foreach (var iword in Words)
                     {
-                        Console.WriteLine(iword.text + " " + iword.num);
-                        break;
+                        if (words[i] == iword.text)
+                        {
+                            Console.WriteLine(iword.text + " " + iword.num);
+                            SaveStrs.Add(iword.text + " " + iword.num);
+                            break;
+                        }
                     }
                 }
             }
+            else
+            {
+                for (; i < outPutNum; i++)
+                {
+                    foreach (var iword in program.Words)
+                    {
+                        if (words[i] == iword.text)
+                        {
+                            Console.WriteLine(iword.text + " " + iword.num);
+                            SaveStrs.Add(iword.text + " " + iword.num);
+                            break;
+                        }
+                    }
+                }
+            }
+            //输出词组
+            foreach(var word in MutipleWords)
+            {
+                Console.WriteLine(word.text+" "+word.num);
+                SaveStrs.Add(word.text + " " + word.num);
+            }
+        }
+        /// <summary>
+        /// 储存内容
+        /// </summary>
+        /// <param name="s_path">储存路径</param>
+        void FileSave()
+        {
+            System.IO.File.WriteAllLines(s_path, SaveStrs);
         }
     }
 }
