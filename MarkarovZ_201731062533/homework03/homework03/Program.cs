@@ -25,29 +25,14 @@ namespace homework3
         int lines = 0;//有效行数
         int characters = 0;//有效字符数
 
+        public static Program program = new Program();
 
         static void Main(string[] args)
         {
-            Program program = new Program();
             string path = "E:/开发内容/1.txt";
             program.FileRead(path);
             program.MainCount();
-            List<string> words = program.WordSort();
-            Console.WriteLine("characters:"+program.characters);
-            Console.WriteLine("words:" + program.Words.Count);
-            Console.WriteLine("lines:" + program.lines);
-            int i = 0;
-            for (; i < 10; i++)
-            {
-                foreach (var iword in program.Words)
-                {
-                    if (words[i] == iword.text)
-                    {
-                        Console.WriteLine(iword.text + " " + iword.num);
-                        break;
-                    }
-                }
-            }
+            program.Output();
         }
 
         /// <summary>
@@ -76,10 +61,12 @@ namespace homework3
                 int lineJudge = 0;
                 foreach (var word in str)
                 {
+                    //判断当前检测字符是否为空
                     if (word != ' ')
                     {
                         lineJudge++;
                         characters++;
+                        //判断当前是否为单词检测状态，判断当前检测字符是否为字母
                         if ((isWord == true) && (((word >= 65) && (word <= 90)) || ((word >= 97) && (word <= 122))))//判断是否为字母内容
                         {
                             wordJudge++;
@@ -87,40 +74,28 @@ namespace homework3
                         }
                         else
                         {
+                            //切换至非单词状态
                             if (wordJudge == 0)
                             {
                                 isWord = false;
                             }
                             else
                             {
+                                //判断当前是否为单词数字后缀
                                 if ((wordJudge >= 4) && ((word >= 48) && (word <= 57)))
                                 {
                                     _word = _word + word;
                                 }
                                 else
                                 {
+                                    //判断是否已经构成单词
                                     if (wordJudge >= 4)
                                     {
-                                        int flag = 0;
-                                        int i = 0;
-                                        foreach (var nword in Words)
-                                        {
-                                            if (nword.text == _word)
-                                            {
-                                                nword.num++;
-                                                flag++;
-                                                break;
-                                            }
-                                            i++;
-                                        }
-                                        if (flag == 0)
-                                        {
-                                            Word aword = new Word(_word);
-                                            Words.Add(aword);
-                                        }
+                                        WordAdd(_word);
                                         wordJudge = 0;
                                         _word = "";
                                     }
+                                    //结束当前判断周期，重新切换至单词检测状态
                                     else
                                     {
                                         wordJudge = 0;
@@ -133,26 +108,12 @@ namespace homework3
                     }
                     else
                     {
+                        //检测到空字符时结束当前判断周期，开启新周期
                         isWord = true;
+                        //判断当前检测结果是否构成单词
                         if (wordJudge >= 4)
                         {
-                            int flag = 0;
-                            int i = 0;
-                            foreach (var nword in Words)
-                            {
-                                if (nword.text == _word)
-                                {
-                                    nword.num++;
-                                    flag++;
-                                    break;
-                                }
-                                i++;
-                            }
-                            if (flag == 0)
-                            {
-                                Word aword = new Word(_word);
-                                Words.Add(aword);
-                            }
+                            WordAdd(_word);
                             wordJudge = 0;
                             _word = "";
                         }
@@ -163,28 +124,14 @@ namespace homework3
                         }
                     }
                 }
+                //在行末判断是否已构成单词
                 if (wordJudge >= 4)
                 {
-                    int flag = 0;
-                    int i = 0;
-                    foreach (var nword in Words)
-                    {
-                        if (nword.text == _word)
-                        {
-                            nword.num++;
-                            flag++;
-                            break;
-                        }
-                        i++;
-                    }
-                    if (flag == 0)
-                    {
-                        Word aword = new Word(_word);
-                        Words.Add(aword);
-                    }
+                    WordAdd(_word);
                     wordJudge = 0;
                     _word = "";
                 }
+                //判断当前行是否为有效行
                 if (lineJudge != 0)
                 {
                     lines++;
@@ -192,17 +139,83 @@ namespace homework3
             }
         }
         /// <summary>
+        /// 往单词集合添加新单词
+        /// </summary>
+        /// <param name="_word">要添加的单词</param>
+        void WordAdd(string _word)
+        {
+            int flag = 0;
+            int i = 0;
+            foreach (var nword in Words)
+            {
+                if (nword.text == _word)
+                {
+                    nword.num++;
+                    flag++;
+                    break;
+                }
+                i++;
+            }
+            if (flag == 0)
+            {
+                Word aword = new Word(_word);
+                Words.Add(aword);
+            }
+        }
+        /// <summary>
         /// 输出单词排序
         /// </summary>
         List<string> WordSort()
         {
+            List<Word> HIVword = new List<Word>();
+            int i = 0;
+            for (; i < Words.Count; i++)
+            {
+                int j = 0;
+                for (; j < Words.Count; j++)
+                {
+                    if (Words[i].num > Words[j].num)
+                    {
+                        Word m = Words[i];
+                        Words[i] = Words[j];
+                        Words[j] = m;
+                    }
+                }
+            }
+            i = 0;
+            for (; i < 10; i++)
+            {
+                HIVword.Add(Words[i]);
+            }
             List<string> words = new List<string>();
-            foreach(var word in Words)
+            foreach(var word in HIVword)
             {
                 words.Add(word.text);
             }
             words.Sort();
             return words;
+        }
+        /// <summary>
+        /// 输出内容至控制台
+        /// </summary>
+        void Output()
+        {
+            List<string> words = program.WordSort();
+            Console.WriteLine("characters:" + program.characters);
+            Console.WriteLine("words:" + program.Words.Count);
+            Console.WriteLine("lines:" + program.lines);
+            int i = 0;
+            for (; i < 10; i++)
+            {
+                foreach (var iword in program.Words)
+                {
+                    if (words[i] == iword.text)
+                    {
+                        Console.WriteLine(iword.text + " " + iword.num);
+                        break;
+                    }
+                }
+            }
         }
     }
 }
