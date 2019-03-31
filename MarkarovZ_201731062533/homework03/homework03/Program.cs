@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace homework3
+namespace Homework3
 {
     class Word
     {
@@ -17,7 +17,7 @@ namespace homework3
             num = 1;
         }
     }
-    class Program
+    public class Program
     {
         List<string> Lines = new List<string>();//从文档读取到的文本内容
         List<Word> Words = new List<Word>();//检索到的单词
@@ -25,8 +25,8 @@ namespace homework3
 
         List<string> SaveStrs = new List<string>();
 
-        int lines = 0;//有效行数
-        int characters = 0;//有效字符数
+        public int lines = 0;//有效行数
+        public int characters = 0;//有效字符数
 
         public static int number;
 
@@ -39,13 +39,33 @@ namespace homework3
 
         static void Main(string[] args)
         {
+            program.TestMethod();
+        }
+
+        public void TestMethod()
+        {
             program.DataInput();
             program.FileRead(path);
             program.MainCount();
             program.Output();
             program.FileSave();
         }
+        public void TestMethod(string l_path,string S_path,int num,int outNum)
+        {
+            path = l_path;
 
+            number = num;
+            outPutNum = outNum;
+            //path = "E:/开发内容/1.txt";
+            s_path = S_path;
+            program.FileRead(path);
+            program.MainCount();
+            program.Output();
+            program.FileSave();
+        }
+        /// <summary>
+        /// 输入参数
+        /// </summary>
         void DataInput()
         {
             Console.WriteLine("请依次输入读取文档路径、词组长度、输出单词数量和存储路径：");
@@ -54,6 +74,7 @@ namespace homework3
             outPutNum = int.Parse(Console.ReadLine());
             //path = "E:/开发内容/1.txt";
             s_path = Console.ReadLine();
+            
         }
         /// <summary>
         /// 读取文档
