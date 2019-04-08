@@ -11,14 +11,14 @@ namespace WordCountTest
         public void TestMethod1()
         {
             string l_path = "E:/开发内容/1.txt";
-            int number = 3;
-            int outPutNum = 5;
-            string s_path = "E:/开发内容/2.txt";
-
+            string r_path = "E:/开发内容/2.txt";
+            int num = 5;
+            int outNum = 3;
             Program program = new Program();
-            program.TestMethod(l_path, s_path, number, outPutNum);
-            Assert.AreEqual(1423, program.characters);
-            Assert.AreEqual(6, program.lines);
+            program.TestMethod(l_path, r_path, num, outNum);
+            var res = Program.program;
+            Assert.AreEqual(9656, res.characters);
+            Assert.AreEqual(15, res.lines);
         }
     }
 }

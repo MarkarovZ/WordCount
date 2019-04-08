@@ -7,6 +7,17 @@ using System.IO;
 
 namespace Homework3
 {
+    public class Res
+    {
+        public int cha;
+        public int line;
+        public Res(int a,int b)
+        {
+            cha = a;
+            line = b;
+        }
+    }
+
     class Word
     {
         public string text;
@@ -42,6 +53,7 @@ namespace Homework3
             program.TestMethod();
         }
 
+
         public void TestMethod()
         {
             program.DataInput();
@@ -50,7 +62,7 @@ namespace Homework3
             program.Output();
             program.FileSave();
         }
-        public void TestMethod(string l_path,string S_path,int num,int outNum)
+        public Res TestMethod(string l_path,string S_path,int num,int outNum)
         {
             path = l_path;
 
@@ -62,6 +74,9 @@ namespace Homework3
             program.MainCount();
             program.Output();
             program.FileSave();
+          
+            Res res = new Res(characters, lines);
+            return res;
         }
         /// <summary>
         /// 输入参数
